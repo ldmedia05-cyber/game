@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A fun, themed crossword game for kids in grade 6 and below. Pick a theme, choose a difficulty, and solve the puzzle!" />
+  <title>Puzzle Pals · Crossword Adventures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>" />
+</head>
+<body data-theme="regular">
+  <!-- Decorative floating shapes (theme-aware) -->
+  <div class="bg-decor" aria-hidden="true"></div>
+
+  <header class="app-header">
+    <h1 class="logo"><span class="logo-icon">🧩</span> Puzzle Pals</h1>
+    <p class="tagline">Crossword Adventures for Curious Kids</p>
+  </header>
+
+  <main class="app-main">
+    <!-- ============ START / SETUP SCREEN ============ -->
+    <section id="setup-screen" class="screen setup-screen">
+      <h2 class="screen-title">Pick your adventure!</h2>
+
+      <div class="setup-block">
+        <h3 class="setup-label">1. Choose a theme</h3>
+        <div id="theme-grid" class="theme-grid" role="radiogroup" aria-label="Theme"></div>
+      </div>
+
+      <div class="setup-block">
+        <h3 class="setup-label">2. Choose a level</h3>
+        <div id="difficulty-row" class="difficulty-row" role="radiogroup" aria-label="Difficulty"></div>
+      </div>
+
+      <button id="start-btn" class="btn btn-primary btn-big">Start Puzzle ▶</button>
+    </section>
+
+    <!-- ============ GAME SCREEN ============ -->
+    <section id="game-screen" class="screen game-screen" hidden>
+      <div class="game-topbar">
+        <button id="back-btn" class="btn btn-ghost" title="Back to menu">‹ Menu</button>
+        <div class="game-meta">
+          <span id="game-theme-label" class="pill"></span>
+          <span id="game-level-label" class="pill"></span>
+        </div>
+        <div class="game-stats">
+          <span class="stat" title="Time">⏱️ <span id="timer">0:00</span></span>
+          <span class="stat" title="Words solved">✅ <span id="solved-count">0/0</span></span>
+        </div>
+      </div>
+
+      <div class="game-body">
+        <div class="board-wrap">
+          <div id="crossword" class="crossword" aria-label="Crossword grid"></div>
+          <div class="board-actions">
+            <button id="check-btn" class="btn btn-secondary" title="Check your answers">Check</button>
+            <button id="hint-btn" class="btn btn-secondary" title="Reveal one letter in the selected word">💡 Hint</button>
+            <button id="reveal-btn" class="btn btn-ghost" title="Reveal the selected word">Reveal Word</button>
+            <button id="new-btn" class="btn btn-ghost" title="Generate a fresh puzzle">🔀 New</button>
+          </div>
+          <div id="hint-bank" class="hint-bank">Hints left: <strong id="hints-left">3</strong></div>
+        </div>
+
+        <div class="clues-panel">
+          <div class="clue-current" id="current-clue">Tap a square to start solving!</div>
+          <div class="clue-columns">
+            <div class="clue-group">
+              <h3 class="clue-heading">Across →</h3>
+              <ol id="across-clues" class="clue-list"></ol>
+            </div>
+            <div class="clue-group">
+              <h3 class="clue-heading">Down ↓</h3>
+              <ol id="down-clues" class="clue-list"></ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile on-screen keyboard hint / hidden input proxy -->
+  <input id="hidden-input" class="hidden-input" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-hidden="true" />
+
+  <!-- ============ WIN MODAL ============ -->
+  <div id="win-modal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="confetti" aria-hidden="true"></div>
+      <h2 id="win-title" class="win-title">🎉 You did it! 🎉</h2>
+      <p id="win-message" class="win-message"></p>
+      <div class="win-stats">
+        <div class="win-stat"><span class="win-stat-num" id="win-time">0:00</span><span class="win-stat-lbl">Time</span></div>
+        <div class="win-stat"><span class="win-stat-num" id="win-score">0</span><span class="win-stat-lbl">Score</span></div>
+        <div class="win-stat"><span class="win-stat-num" id="win-stars">⭐</span><span class="win-stat-lbl">Stars</span></div>
+      </div>
+      <div class="modal-actions">
+        <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+        <button id="menu-btn" class="btn btn-ghost">Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <span>Made for grade 6 and below · Learn & have fun! 🌟</span>
+  </footer>
+
+  <script src="js/words.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

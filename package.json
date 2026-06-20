@@ -1,0 +1,15 @@
+{
+  "name": "puzzle-pals-crossword",
+  "version": "1.0.0",
+  "description": "Puzzle Pals — a fun, themed crossword game for kids in grade 6 and below. Pure static site, no build step.",
+  "scripts": {
+    "test": "node test-integration.js && node test-typing.js",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": ["crossword", "kids", "education", "game", "puzzle"],
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "jsdom": "^24.1.3"
+  }
+}
