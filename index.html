@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A fun, themed crossword game for kids in grade 6 and below. Pick a theme, choose a difficulty, and solve the puzzle!" />
-  <title>Puzzle Pals · Crossword Adventures</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="A fun, themed crossword game for kids in grade 6 and below by vbuild. Pick a theme, choose a difficulty, and solve the puzzle!" />
+  <meta name="theme-color" content="#3b82f6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Puzzle Pals" />
+  <meta name="author" content="vbuild" />
+  <title>Puzzle Pals · Crossword Adventures by vbuild</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
@@ -18,6 +23,7 @@
   <header class="app-header">
     <h1 class="logo"><span class="logo-icon">🧩</span> Puzzle Pals</h1>
     <p class="tagline">Crossword Adventures for Curious Kids</p>
+    <p class="brand-by">by <span class="brand-name">vbuild&trade;</span></p>
   </header>
 
   <main class="app-main">
@@ -81,7 +87,7 @@
     </section>
   </main>
 
-  <!-- Mobile on-screen keyboard hint / hidden input proxy -->
+  <!-- Invisible proxy input: lets mobile browsers open the native keyboard on tap -->
   <input id="hidden-input" class="hidden-input" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-hidden="true" />
 
   <!-- ============ WIN MODAL ============ -->
@@ -103,7 +109,8 @@
   </div>
 
   <footer class="app-footer">
-    <span>Made for grade 6 and below · Learn & have fun! 🌟</span>
+    <p class="footer-dedication">💖 FOR MEENU AND AADU 💖</p>
+    <p class="footer-brand">A <span class="brand-name">vbuild&trade;</span> creation · Made for grade 6 and below · Learn &amp; have fun! 🌟</p>
   </footer>
 
   <script src="js/words.js"></script>

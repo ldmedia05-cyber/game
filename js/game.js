@@ -127,10 +127,9 @@
     state.cellEls = {};
     const { rows, cols } = state.layout;
     board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    // Pick a cell size that fits comfortably; CSS aspect-ratio keeps squares.
-    const maxBoard = Math.min(window.innerWidth - 48, 560);
-    const cellSize = Math.floor(Math.min(maxBoard / cols, 46));
-    board.style.width = cellSize * cols + (cols - 1) * 2 + "px";
+    // Fluid width: fills the screen up to a cap, and adapts automatically on
+    // rotate/resize (CSS handles it). Cells stay square via aspect-ratio.
+    board.style.width = `min(calc(100vw - 24px), ${cols * 46}px, 560px)`;
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
@@ -221,7 +220,7 @@
 
   function updateHighlight() {
     // Clear
-    Object.values(state.cellEls).forEach((c) => c.classList.remove("active"));
+    Object.values(state.cellEls).forEach((c) => c.classList.remove("active", "cursor"));
     document.querySelectorAll(".clue-list li").forEach((li) => li.classList.remove("active"));
 
     const clue = activeClue();
@@ -237,9 +236,15 @@
       $("current-clue").textContent =
         `${clue.number} ${clue.dir === "across" ? "Across →" : "Down ↓"}: ${clue.clue}`;
     }
-    // Emphasize the single active cell.
+    // Emphasize the exact square being typed into with a bright, high-contrast
+    // "cursor" highlight so it's obvious where letters will appear.
     if (state.activeKey && state.cellEls[state.activeKey]) {
-      state.cellEls[state.activeKey].classList.add("active");
+      const cur = state.cellEls[state.activeKey];
+      cur.classList.add("active", "cursor");
+      // Keep that square in view (handy on phones when the keyboard is open).
+      if (typeof cur.scrollIntoView === "function") {
+        cur.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
     }
   }
 
