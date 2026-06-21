@@ -20,8 +20,25 @@ build step, no server, no dependencies to ship. Just open it and play.
 - **Kid-friendly help**: a **Check** button, **💡 Hints** (reveal one letter),
   and **Reveal Word** so nobody gets stuck and frustrated.
 - **Timer, score, and star rating** with a celebratory confetti win screen.
-- **Works on phones, tablets, and computers** — tap a square and type, use the
-  on-screen keyboard, or use a physical keyboard with arrow keys and Tab.
+- **🤝 Play Together** — share a link and a friend gets the *exact same puzzle*
+  on their own device, so you can both solve it and compare your time and score.
+- **Works on phones, tablets, and computers** — tap a square and type using your
+  device's keyboard, or use a physical keyboard with arrow keys and Tab.
+
+## 🤝 Play Together (shared puzzles)
+
+Want to play the same crossword as a friend? In any puzzle, tap
+**🤝 Play Together** (also offered on the win screen) to get a shareable link
+like:
+
+```
+https://your-site.example/?game=halloween-tricky-k3f9
+```
+
+Anyone who opens that link gets the **identical** grid and clues — the puzzle is
+generated deterministically from the `theme-level-seed` in the URL, so no server
+is needed. Each player solves on their own device; then compare your times,
+scores, and stars. Great for siblings or classmates racing each other!
 
 ## ▶️ How to play
 

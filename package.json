@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Puzzle Pals — a fun, themed crossword game for kids in grade 6 and below. Pure static site, no build step.",
   "scripts": {
-    "test": "node test-integration.js && node test-typing.js",
+    "test": "node test-integration.js && node test-typing.js && node test-share.js",
     "start": "python3 -m http.server 8080"
   },
   "keywords": ["crossword", "kids", "education", "game", "puzzle"],

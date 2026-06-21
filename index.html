@@ -57,6 +57,10 @@
         </div>
       </div>
 
+      <div id="share-banner" class="share-banner" hidden>
+        👥 You're playing a shared puzzle — solve it and compare with your friend!
+      </div>
+
       <div class="game-body">
         <div class="board-wrap">
           <div id="crossword" class="crossword" aria-label="Crossword grid"></div>
@@ -64,6 +68,7 @@
             <button id="check-btn" class="btn btn-secondary" title="Check your answers">Check</button>
             <button id="hint-btn" class="btn btn-secondary" title="Reveal one letter in the selected word">💡 Hint</button>
             <button id="reveal-btn" class="btn btn-ghost" title="Reveal the selected word">Reveal Word</button>
+            <button id="play-together-btn" class="btn btn-secondary" title="Share this exact puzzle so a friend can play it too">🤝 Play Together</button>
             <button id="new-btn" class="btn btn-ghost" title="Generate a fresh puzzle">🔀 New</button>
           </div>
           <div id="hint-bank" class="hint-bank">Hints left: <strong id="hints-left">3</strong></div>
@@ -102,8 +107,27 @@
       </div>
       <div class="modal-actions">
         <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+        <button id="win-share-btn" class="btn btn-secondary">🤝 Play Together</button>
         <button id="menu-btn" class="btn btn-ghost">Back to Menu</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ============ PLAY TOGETHER (SHARE) DIALOG ============ -->
+  <div id="share-modal" class="modal-overlay" hidden>
+    <div class="modal-card share-card">
+      <h2 class="win-title">🤝 Play Together</h2>
+      <p class="share-text">
+        Send this link to a friend. You'll <strong>both get the exact same</strong>
+        <span id="share-puzzle-label"></span> puzzle — then race to finish!
+      </p>
+      <input id="share-link" class="share-link" type="text" readonly aria-label="Shareable game link" />
+      <div class="modal-actions">
+        <button id="copy-link-btn" class="btn btn-primary">📋 Copy link</button>
+        <button id="native-share-btn" class="btn btn-secondary" hidden>Share…</button>
+        <button id="share-close-btn" class="btn btn-ghost">Close</button>
+      </div>
+      <p id="copy-status" class="copy-status" aria-live="polite"></p>
     </div>
   </div>
 

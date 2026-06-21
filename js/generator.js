@@ -17,10 +17,32 @@
  */
 
 (function (global) {
-  function shuffle(arr) {
+  // --- Seeded RNG so a given seed always reproduces the SAME puzzle ---
+  // Hash any string/number into a 32-bit integer (xfnv1a).
+  function hashSeed(str) {
+    str = String(str);
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  // mulberry32: tiny deterministic PRNG, identical across all JS engines.
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffle(arr, rnd) {
+    rnd = rnd || Math.random;
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(rnd() * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
@@ -200,14 +222,19 @@
 
   // Public: generate the best layout from a pool of entries.
   // wantCount = how many words we aim to include.
-  function generate(pool, wantCount) {
+  // seed (optional) = makes generation deterministic so the same seed always
+  // produces the exact same puzzle (used for "Play Together" shared links).
+  function generate(pool, wantCount, seed) {
+    const rnd = (seed === undefined || seed === null)
+      ? Math.random
+      : mulberry32(hashSeed(seed));
     let best = null;
     const attempts = 25;
 
     for (let t = 0; t < attempts; t++) {
       // Pick a working set of the desired size, then prefer longer words first
       // for the seed so they interlock well.
-      const shuffled = shuffle(pool);
+      const shuffled = shuffle(pool, rnd);
       const sorted = shuffled
         .slice(0, Math.min(pool.length, wantCount + 3))
         .sort((a, b) => b.a.length - a.a.length);

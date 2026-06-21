@@ -20,6 +20,8 @@
   const state = {
     theme: "regular",
     level: "easy",
+    seed: null,           // deterministic puzzle seed (for "Play Together")
+    shared: false,        // did we arrive via a shared link?
     layout: null,
     // grid model: cellInfo["r,c"] = { letter, input, number, acrossClue, downClue }
     cells: {},
@@ -92,9 +94,11 @@
     const pool = THEMES[state.theme].levels[state.level];
     const want = (DIFFICULTIES.find((d) => d.id === state.level) || {}).words || 7;
     let layout = null;
-    // A few tries in case a rare attempt returns something tiny.
+    // A few tries in case a rare attempt returns something tiny. The seed is
+    // varied deterministically per attempt so two players sharing the same seed
+    // always end up with the identical puzzle.
     for (let i = 0; i < 6 && !layout; i++) {
-      const candidate = CrosswordGen.generate(pool, want);
+      const candidate = CrosswordGen.generate(pool, want, state.seed + "#" + i);
       if (candidate && candidate.clues.length >= Math.min(want, 5)) layout = candidate;
       else if (candidate && (!layout || candidate.clues.length > layout.clues.length)) layout = candidate;
     }
@@ -482,7 +486,12 @@
   }
 
   // ---------- Screen switching ----------
-  function startGame() {
+  function startGame(opts) {
+    opts = opts || {};
+    // Use the provided seed (shared link) or roll a fresh one for a new puzzle.
+    state.seed = opts.seed || newSeed();
+    state.shared = !!opts.shared;
+
     buildPuzzle();
     if (!state.layout) {
       alert("Oops! Could not build a puzzle. Please try another theme or level.");
@@ -503,19 +512,134 @@
     renderClues();
     updateSolvedCount();
 
+    $("share-banner").hidden = !state.shared;
     $("setup-screen").hidden = true;
     $("game-screen").hidden = false;
+
+    // Reflect this exact puzzle in the address bar so it can be copied/shared.
+    updateUrl();
 
     // Auto-select the first clue.
     selectClue(state.layout.clues[0]);
     startTimer();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window.scrollTo === "function") {
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { /* ignore */ }
+    }
   }
 
   function backToMenu() {
     stopTimer();
+    state.shared = false;
+    $("share-banner").hidden = true;
+    clearUrl();
+    syncPickers();
     $("game-screen").hidden = true;
     $("setup-screen").hidden = false;
+  }
+
+  // ---------- Play Together (shared links) ----------
+  function newSeed() {
+    // Up to ~6 base36 chars — short and link-friendly.
+    return Math.floor(Math.random() * 2176782336).toString(36);
+  }
+
+  function parseGameParam() {
+    try {
+      const g = new URLSearchParams(window.location.search).get("game");
+      if (!g) return null;
+      const parts = g.split("-");
+      if (parts.length < 3) return null;
+      const theme = parts[0];
+      const level = parts[1];
+      const seed = parts.slice(2).join("-");
+      if (!THEMES[theme]) return null;
+      if (!DIFFICULTIES.some((d) => d.id === level)) return null;
+      if (!seed) return null;
+      return { theme, level, seed };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function buildShareLink() {
+    const base = window.location.origin + window.location.pathname;
+    return `${base}?game=${state.theme}-${state.level}-${state.seed}`;
+  }
+
+  function updateUrl() {
+    try {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, "", buildShareLink());
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  function clearUrl() {
+    try {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  // Keep the setup-screen selection cards in sync with the active theme/level.
+  function syncPickers() {
+    document.querySelectorAll("#theme-grid .theme-card").forEach((c) =>
+      c.setAttribute("aria-checked", c.dataset.theme === state.theme ? "true" : "false")
+    );
+    document.querySelectorAll("#difficulty-row .diff-card").forEach((c) =>
+      c.setAttribute("aria-checked", c.dataset.level === state.level ? "true" : "false")
+    );
+    document.body.setAttribute("data-theme", state.theme);
+  }
+
+  function openShareModal() {
+    $("share-link").value = buildShareLink();
+    const t = THEMES[state.theme];
+    const d = DIFFICULTIES.find((x) => x.id === state.level);
+    $("share-puzzle-label").textContent = `${t.emoji} ${t.name} · ${d.label}`;
+    $("copy-status").textContent = "";
+    $("native-share-btn").hidden = !(navigator && navigator.share);
+    $("share-modal").hidden = false;
+    setTimeout(() => {
+      const inp = $("share-link");
+      inp.focus();
+      if (inp.select) inp.select();
+    }, 50);
+  }
+
+  function closeShareModal() {
+    $("share-modal").hidden = true;
+  }
+
+  function copyLink() {
+    const link = $("share-link").value;
+    const ok = () => { $("copy-status").textContent = "Link copied! Send it to your friend. 🎉"; };
+    const fallback = () => {
+      try {
+        $("share-link").focus();
+        $("share-link").select();
+        document.execCommand("copy");
+        ok();
+      } catch (e) {
+        $("copy-status").textContent = "Press and hold the link above to copy it.";
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(ok).catch(fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function nativeShare() {
+    if (navigator && navigator.share) {
+      navigator.share({
+        title: "Crosswords Ahoy!",
+        text: "Let's play this crossword together! 🧩",
+        url: $("share-link").value,
+      }).catch(() => { /* user cancelled */ });
+    }
   }
 
   // ---------- Input wiring ----------
@@ -588,6 +712,12 @@
       $("win-modal").hidden = true;
       backToMenu();
     });
+    // Play Together (share) controls.
+    $("play-together-btn").addEventListener("click", openShareModal);
+    $("win-share-btn").addEventListener("click", openShareModal);
+    $("copy-link-btn").addEventListener("click", copyLink);
+    $("native-share-btn").addEventListener("click", nativeShare);
+    $("share-close-btn").addEventListener("click", closeShareModal);
     // Keep the board tappable -> refocus hidden input.
     $("crossword").addEventListener("click", () => focusInput());
   }
@@ -599,6 +729,16 @@
     renderDifficultyPicker();
     wireButtons();
     wireInput();
+
+    // If we arrived via a "Play Together" link, jump straight into that exact
+    // puzzle so both players get an identical board.
+    const shared = parseGameParam();
+    if (shared) {
+      state.theme = shared.theme;
+      state.level = shared.level;
+      syncPickers();
+      startGame({ seed: shared.seed, shared: true });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", init);
